@@ -7,7 +7,7 @@ import {
 } from "expo-image-picker";
 import { Colors } from "../../constants/colors";
 
-export default function ImagePicker() {
+export default function ImagePicker({ onTakeImage }) {
   const [cameraPermissionInformation, requestPermission] =
     useCameraPermissions();
   const [imageUri, setImageUri] = useState(null);
@@ -21,7 +21,13 @@ export default function ImagePicker() {
     if (cameraPermissionInformation.status === PermissionStatus.DENIED) {
       Alert.alert(
         "Insifficient Permissions!",
-        "You need to grant camera permissions to use this app."
+        "You need to grant camera permissions to use this app.",
+        [
+          {
+            text: "OK",
+            onPress: requestPermission,
+          },
+        ]
       );
       return false;
     }
@@ -42,6 +48,7 @@ export default function ImagePicker() {
     });
 
     setImageUri(photo.assets[0].uri);
+    onTakeImage(photo.assets[0].uri);
   }
 
   let imagePreview = <Text>No image taken yet!</Text>;

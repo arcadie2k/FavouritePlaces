@@ -1,5 +1,6 @@
 import { StyleSheet, FlatList, View, Text } from "react-native";
 import { Colors } from "../../constants/colors";
+import PlaceItem from "./PlaceItem";
 
 export default function PlacesList({ places = [] }) {
   if (!places || places.length === 0)
@@ -13,9 +14,10 @@ export default function PlacesList({ places = [] }) {
 
   return (
     <FlatList
+      style={styles.list}
       data={places}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <PlacesItem place={item} />}
+      renderItem={({ item }) => <PlaceItem place={item} />}
     />
   );
 }
@@ -29,5 +31,8 @@ const styles = StyleSheet.create({
   fallbackText: {
     fontSize: 16,
     color: Colors.primary200,
+  },
+  list: {
+    margin: 24,
   },
 });

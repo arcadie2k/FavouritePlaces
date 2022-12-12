@@ -8,7 +8,9 @@ import {
   PermissionStatus,
 } from "expo-location";
 
-export default function LocationPicker() {
+import { GOOGLE_API_KEY } from "@env";
+
+export default function LocationPicker({ onPickLocation }) {
   const [loc, setLoc] = useState(null);
   const [locationPermission, requestPermission] = useForegroundPermissions();
   const navigation = useNavigation();
@@ -17,7 +19,6 @@ export default function LocationPicker() {
   const mapPickedLocation = route.params ?? null;
 
   function getMapPreview({ lat, lng }) {
-    const GOOGLE_API_KEY = "";
     const imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=13&size=400x200&maptype=roadmap&markers=color:red%7Clabel:C%7C${lat},${lng}&key=${GOOGLE_API_KEY}`;
     return imagePreviewUrl;
   }
@@ -31,7 +32,8 @@ export default function LocationPicker() {
     if (locationPermission.status === PermissionStatus.DENIED) {
       Alert.alert(
         "Insifficient Permissions!",
-        "You need to grant location permissions to use this app."
+        "You need to grant location permissions to use this app.",
+        [{ text: "OK", onPress: requestPermission }]
       );
       return false;
     }
@@ -46,10 +48,14 @@ export default function LocationPicker() {
     }
 
     const pos = await getCurrentPositionAsync();
-    setLoc({
+
+    const obj = {
       lat: pos.coords.latitude,
       lng: pos.coords.longitude,
-    });
+    };
+
+    setLoc(obj);
+    onPickLocation(obj);
   }
 
   function pickLocationHandler() {
@@ -57,7 +63,10 @@ export default function LocationPicker() {
   }
 
   useEffect(() => {
-    if (mapPickedLocation) setLoc(mapPickedLocation);
+    if (mapPickedLocation) {
+      setLoc(mapPickedLocation);
+      onPickLocation(mapPickedLocation);
+    }
   }, [mapPickedLocation]);
 
   let imagePreview = <Text>No location yet!</Text>;
